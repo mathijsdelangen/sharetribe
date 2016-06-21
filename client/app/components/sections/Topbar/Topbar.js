@@ -1,5 +1,8 @@
+/* eslint-disable no-console */
+
 import { Component, PropTypes } from 'react';
 import r, { div } from 'r-dom';
+import * as placesUtils from '../../../utils/places';
 
 import { t } from '../../../utils/i18n';
 import { routes as routesProp, marketplaceContext } from '../../../utils/PropTypes';
@@ -53,7 +56,7 @@ const avatarDropdownProps = (avatarDropdown, customColor, username, isAdmin, not
 const LABEL_TYPE_MENU = 'menu';
 const LABEL_TYPE_DROPDOWN = 'dropdown';
 
-const SEARCH_ENABLED = false;
+const SEARCH_ENABLED = true;
 
 const profileLinks = function profileLinks(username, isAdmin, router, location, customColor, unReadMessagesCount) {
   if (username) {
@@ -119,6 +122,55 @@ const DEFAULT_CONTEXT = {
   marketplace_color1: styleVariables['--customColorFallback'],
   marketplace_color2: styleVariables['--customColor2Fallback'],
   loggedInUsername: null,
+};
+
+const parseQuery = (searchQuery) => {
+  const parts = (searchQuery || '')
+          .replace(/^\?/, '')
+          .replace(/#.*$/, '')
+          .split('&');
+
+  return parts.reduce((params, keyval) => {
+    const pair = keyval.split('=');
+    const pairLength = 2;
+    if (pair.length === pairLength) {
+      params[pair[0]] = decodeURIComponent(pair[1]); // eslint-disable-line no-param-reassign
+    }
+    return params;
+  }, {});
+};
+
+const currentSearchParams = (searchQuery) => {
+  const PARAMS_TO_KEEP = ['view', 'locale'];
+  const parsedParams = parseQuery(searchQuery);
+
+  return Object.keys(parsedParams).reduce((params, key) => {
+    if (PARAMS_TO_KEEP.includes(key)) {
+      params[key] = parsedParams[key]; // eslint-disable-line no-param-reassign
+    }
+    return params;
+  }, {});
+};
+
+const isValid = (value) => typeof value === 'number' && !isNaN(value) || !!value;
+
+const createQuery = (searchParams) => {
+  const extraParams = currentSearchParams(window.location.search);
+  const params = { ...extraParams, ...searchParams };
+
+  console.log('creating query string from params:', params);
+  const paramKeys = Object.keys(params);
+  paramKeys.sort();
+
+  return paramKeys.reduce((url, key) => {
+    const val = params[key];
+
+    if (!isValid(val)) {
+      return url;
+    }
+
+    return `${url}${url ? '&' : '?'}${key}=${encodeURIComponent(val)}`;
+  }, '');
 };
 
 class Topbar extends Component {
@@ -242,9 +294,30 @@ class Topbar extends Component {
           mode: this.props.search.mode,
           keywordPlaceholder: this.props.search.keyword_placeholder,
           locationPlaceholder: this.props.search.location_placeholder,
-          onSubmit: this.props.search.onSubmit || (() => {
-            console.log('submit search'); // eslint-disable-line no-console
-          }),
+          keywordQuery: this.props.search.keyword_query,
+          locationQuery: this.props.search.location_query,
+          onSubmit: ({ keywordQuery, locationQuery, place }) => {
+            console.log({ // eslint-disable-line no-console
+              keywordQuery,
+              locationQuery,
+              coordinates: placesUtils.coordinates(place),
+              viewport: placesUtils.viewport(place),
+              maxDistance: placesUtils.maxDistance(place),
+            });
+            const query = createQuery({
+              q: keywordQuery,
+              lq: locationQuery,
+              lc: placesUtils.coordinates(place),
+              boundingbox: placesUtils.viewport(place),
+              distance_max: placesUtils.maxDistance(place),
+            });
+            const searchUrl = `${this.props.search_path}${query}`;
+            console.log('Search URL:', `"${searchUrl}"`);
+
+            // TODO: submit search
+            // window.location.assign(searchUrl);
+            // this.actions.submitSearch(query);
+          },
         }) :
         div({ className: css.topbarMobileSearchPlaceholder }),
       div({ className: css.topbarMenuSpacer }, this.props.menu ?
@@ -274,7 +347,7 @@ class Topbar extends Component {
           url: newListingRoute,
           customColor: marketplace_color1,
         }) :
-        null,
+      null,
     ]);
   }
 }
@@ -285,6 +358,7 @@ const { arrayOf, number, object, shape, string } = PropTypes;
 Topbar.propTypes = {
   logo: object.isRequired,
   search: object,
+  search_path: PropTypes.string.isRequired,
   avatarDropdown: object,
   menu: shape({
     limit_priority_links: number,
