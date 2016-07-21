@@ -2,7 +2,7 @@ source 'http://rubygems.org'
 
 ruby '2.3.1'
 
-gem 'rails', '4.2.5.2'
+gem 'rails', '4.2.7'
 
 gem 'coffee-rails', "~> 4.0.1"
 gem 'uglifier', "~> 2.7.2"
@@ -33,7 +33,6 @@ gem 'rest-client', '~> 1.8.0'
 gem 'paperclip', '~> 4.3.6'
 gem 'delayed_paperclip', "~> 2.9.1"
 
-gem 'aws-sdk-v1', "~> 1.64.0"
 gem 'aws-sdk', '~> 2'
 gem "will_paginate", '~>3.0.5'
 gem 'dalli', "~> 2.6.4"
