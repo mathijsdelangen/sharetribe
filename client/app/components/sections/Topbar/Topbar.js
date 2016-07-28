@@ -229,7 +229,7 @@ class Topbar extends Component {
     const mobileMenuAvatarProps = this.props.avatarDropdown && loggedInUsername ?
             { ...this.props.avatarDropdown.avatar, ...{ url: profileRoute } } :
             null;
-    const isAdmin = this.props.isAdmin && loggedInUsername;
+    const isAdmin = !!(this.props.isAdmin && loggedInUsername);
 
     const mobileMenuLanguageProps = hasMultipleLanguages ?
       Object.assign({}, {
@@ -331,7 +331,7 @@ class Topbar extends Component {
       this.props.avatarDropdown && loggedInUsername ?
         r(AvatarDropdown, {
           ...avatarDropdownProps(this.props.avatarDropdown, marketplace_color1,
-                                 loggedInUsername, this.props.isAdmin, this.props.unReadMessagesCount, this.props.routes),
+                                 loggedInUsername, isAdmin, this.props.unReadMessagesCount, this.props.routes),
           classSet: css.topbarAvatarDropdown,
         }) :
         r(LoginLinks, {
