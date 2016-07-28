@@ -333,20 +333,6 @@
     }
   }
 
-  /* CSS triangle pointing to the search icon above */
-  &::before {
-    content: '';
-    position: absolute;
-    top: calc(-2 * var(--SearchBar_mobileTriangleSize));
-    right: calc(var(--SearchBar_mobileHeight) / 2 - var(--SearchBar_mobileTriangleSize));
-    border: var(--SearchBar_mobileTriangleSize) solid transparent;
-    border-bottom-color: var(--SearchBar_mobileButtonBackgroundColor);
-
-    @media (--large-viewport) {
-      display: none;
-    }
-  }
-
   & svg {
     position: absolute;
     top: calc(var(--SearchBar_mobileHeight) / 2 - var(--SearchBar_iconSize) / 2);
@@ -366,6 +352,7 @@
 }
 
 .mobileToggle {
+  position: relative;
   display: inline-block;
   margin: 0;
   padding: 0;
@@ -390,4 +377,24 @@
   @media (--large-viewport) {
     display: none;
   }
+
+  /* CSS triangle pointing to the search toggle icon */
+  &::before {
+    display: none;
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: calc(var(--SearchBar_mobileHeight) / 2 - var(--SearchBar_mobileTriangleSize));
+    border: var(--SearchBar_mobileTriangleSize) solid transparent;
+    border-bottom-color: var(--SearchBar_mobileButtonBackgroundColor);
+
+    @media (--medium-viewport) {
+      border-bottom-color: var(--SearchBar_mobileBackgroundColor);
+    }
+
+    @nest .mobileMenuOpen & {
+      display: block;
+    }
+  }
+
 }
