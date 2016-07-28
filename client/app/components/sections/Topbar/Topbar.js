@@ -292,8 +292,8 @@ class Topbar extends Component {
       SEARCH_ENABLED && this.props.search ?
         r(SearchBar, {
           mode: this.props.search.mode,
-          keywordPlaceholder: this.props.search.keyword_placeholder,
-          locationPlaceholder: this.props.search.location_placeholder,
+          keywordPlaceholder: t('web.topbar.search_placeholder'),
+          locationPlaceholder: t('web.topbar.search_location_placeholder'),
           keywordQuery: this.props.search.keyword_query,
           locationQuery: this.props.search.location_query,
           onSubmit: ({ keywordQuery, locationQuery, place }) => {

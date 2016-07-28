@@ -66,8 +66,6 @@ module TopbarHelper
       },
       search: {
         mode: main_search.to_s,
-        keyword_placeholder: 'Search...', # TODO: localise
-        location_placeholder: 'Location', # TODO: localise
 
         # TODO: figure where to get these
         # keyword_query: params[:q],
