@@ -49,8 +49,17 @@ module TopbarHelper
 
     links.concat(user_links)
 
-    location_search_available = true # TODO: fix
-    main_search = location_search_available ? MarketplaceService::API::Api.configurations.get(community_id: community.id).data[:main_search] : :keyword
+    main_search = FeatureFlagHelper.location_search_available ?
+      MarketplaceService::API::Api.configurations.get(community_id: community.id).data[:main_search] :
+      :keyword
+
+    search_url_base = PathHelpers.search_url({
+      community_id: community.id,
+      opts: {
+        only_path: true,
+        locale: user.present? && user.locale.present? ? user.locale : community.default_locale
+      }
+    })
 
     {
       logo: {
@@ -66,12 +75,8 @@ module TopbarHelper
       },
       search: {
         mode: main_search.to_s,
-
-        # TODO: figure where to get these
-        # keyword_query: params[:q],
-        # location_query: params[:lq]
       },
-      search_path: '/', # TODO: fix
+      search_path: search_url_base,
       menu: {
         links: links,
         limit_priority_links: Maybe(MarketplaceService::API::Api.configurations.get(community_id: community.id).data)[:limit_priority_links].or_else(nil)
